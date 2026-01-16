@@ -24,13 +24,14 @@ namespace task_manager_api.Repository
             return tasks;
         }
 
-        public async Task CreateTaskAsync(CreateTaskDTO taskDTO)
+        public async Task<Tasks> CreateTaskAsync(CreateTaskDTO taskDTO)
         {
             Tasks task = new Tasks
             {
-                Title = taskDTO.title
+                Title = taskDTO.Title
             };
             await _taskCollection.InsertOneAsync(task);
+            return task;
         }
 
         public async Task<Tasks> GetTaskByIdAsync(string Id)
@@ -38,14 +39,16 @@ namespace task_manager_api.Repository
             return await _taskCollection.Find(task => task.Id == Id).FirstOrDefaultAsync();
         }
 
-        public async Task UpdateTasksAsync(string Id, Tasks task)
+        public async Task<Tasks> UpdateTasksAsync(string Id, Tasks task)
         {
             await _taskCollection.ReplaceOneAsync(t => t.Id == Id,task);
+            return task;
         }
 
-        public async Task DeleteTaskAsync(string Id)
+        public async Task<String> DeleteTaskAsync(string Id)
         {
             await _taskCollection.DeleteOneAsync(t => t.Id == Id);
+            return Id;
         }
     }
 }

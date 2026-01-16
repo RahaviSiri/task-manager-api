@@ -15,21 +15,21 @@ namespace task_manager_api.Services
             return _taskManagerRepository.GetTasksAsync();
         }
 
-        public async Task CreateTasksAsync(CreateTaskDTO taskDTO)
+        public async Task<Tasks> CreateTasksAsync(CreateTaskDTO taskDTO)
         {
-            await _taskManagerRepository.CreateTaskAsync(taskDTO);
+            return await _taskManagerRepository.CreateTaskAsync(taskDTO);
         }
 
-        public async Task UpdateTasksAsync(string Id, CreateTaskDTO taskDTO)
+        public async Task<Tasks> UpdateTasksAsync(string Id, CreateTaskDTO taskDTO)
         {
             Tasks task = await _taskManagerRepository.GetTaskByIdAsync(Id);
-            task.Title = taskDTO.title;
-            await _taskManagerRepository.UpdateTasksAsync(Id,task);
+            task.Title = taskDTO.Title;
+            return await _taskManagerRepository.UpdateTasksAsync(Id,task);
         }
 
-        public async Task DeleteTaskAsync(string Id)
+        public async Task<String> DeleteTaskAsync(string Id)
         {
-            await _taskManagerRepository.DeleteTaskAsync(Id);
+            return await _taskManagerRepository.DeleteTaskAsync(Id);
         }
     }
 }

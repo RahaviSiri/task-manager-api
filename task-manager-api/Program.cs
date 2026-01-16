@@ -20,9 +20,10 @@ builder.Services.Configure<MongoDbSettings>(
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
-        builder => builder.AllowAnyOrigin()
+        builder => builder.WithOrigins("http://localhost:3000")
                           .AllowAnyHeader()
-                          .AllowAnyMethod());
+                          .AllowAnyMethod()
+                          .AllowCredentials());
 });
 
 builder.Services.AddSingleton<TaskManagerService>();
@@ -30,7 +31,13 @@ builder.Services.AddSingleton<TaskManagerRepository>();
 
 
 var app = builder.Build();
-app.MapHub<TaskHub>("/taskHub"); // Assign endpoint to get connection with signalR for client side
+app.MapHub<TaskHub>("/taskHub").RequireCors(builder =>
+    builder.WithOrigins("http://localhost:3000")
+           .AllowAnyHeader()
+           .AllowAnyMethod()
+           .AllowCredentials()
+);
+// Assign endpoint to get connection with signalR for client side
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

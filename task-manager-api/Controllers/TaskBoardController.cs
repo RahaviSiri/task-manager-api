@@ -32,25 +32,25 @@ namespace task_manager_api.Controllers
         [HttpPost(Name = "AddTasks")]
         public async Task<IActionResult> CreateTasksAsync([FromBody] CreateTaskDTO taskDTO)
         {
-            await _taskManagerService.CreateTasksAsync(taskDTO);
-            await _hub.Clients.All.SendAsync("TaskCreated");
-            return Ok("Task Created");
+            Tasks task = await _taskManagerService.CreateTasksAsync(taskDTO);
+            await _hub.Clients.All.SendAsync("TaskCreated", task);
+            return Ok(task);
         }
 
         [HttpPut("{Id}")]
         public async Task<IActionResult> UpdateTasksAsync(string Id,[FromBody] CreateTaskDTO taskDTO)
         {
-            await _taskManagerService.UpdateTasksAsync(Id,taskDTO);
-            await _hub.Clients.All.SendAsync("TaskUpdated");
-            return Ok("Task Updated");
+            Tasks task = await _taskManagerService.UpdateTasksAsync(Id,taskDTO);
+            await _hub.Clients.All.SendAsync("TaskUpdated", task);
+            return Ok(task);
         }
 
         [HttpDelete("{Id}")]
         public async Task<IActionResult> DeleteTaskAsync(string Id)
         {
-            await _taskManagerService.DeleteTaskAsync(Id);
-            await _hub.Clients.All.SendAsync("TaskDeleted");
-            return Ok("Task Deleted");
+            String id = await _taskManagerService.DeleteTaskAsync(Id);
+            await _hub.Clients.All.SendAsync("TaskDeleted", id);
+            return Ok(id);
         }
     }
 }
