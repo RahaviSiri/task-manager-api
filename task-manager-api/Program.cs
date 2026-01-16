@@ -1,4 +1,6 @@
 using task_manager_api.Config;
+using task_manager_api.Repository;
+using task_manager_api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,10 @@ builder.Services.AddCors(options =>
                           .AllowAnyHeader()
                           .AllowAnyMethod());
 });
+
+builder.Services.AddSingleton<TaskManagerService>();
+builder.Services.AddSingleton<TaskManagerRepository>();
+
 
 var app = builder.Build();
 
