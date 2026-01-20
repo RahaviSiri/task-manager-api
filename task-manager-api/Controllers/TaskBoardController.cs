@@ -25,14 +25,14 @@ namespace task_manager_api.Controllers
         [HttpGet(Name = "GetTasks")]
         public async Task<IActionResult> GetTasksAsync()
         {
-            List<Tasks> tasks = await _taskManagerService.GetTasksAsync();
+            List<TaskEntity> tasks = await _taskManagerService.GetTasksAsync();
             return Ok(tasks);
         }
 
         [HttpPost(Name = "AddTasks")]
         public async Task<IActionResult> CreateTasksAsync([FromBody] CreateTaskDTO taskDTO)
         {
-            Tasks task = await _taskManagerService.CreateTasksAsync(taskDTO);
+            TaskEntity task = await _taskManagerService.CreateTasksAsync(taskDTO);
             await _hub.Clients.All.SendAsync("TaskCreated", task);
             return Ok(task);
         }
@@ -40,7 +40,7 @@ namespace task_manager_api.Controllers
         [HttpPut("{Id}")]
         public async Task<IActionResult> UpdateTasksAsync(string Id,[FromBody] CreateTaskDTO taskDTO)
         {
-            Tasks task = await _taskManagerService.UpdateTasksAsync(Id,taskDTO);
+            TaskEntity task = await _taskManagerService.UpdateTasksAsync(Id,taskDTO);
             await _hub.Clients.All.SendAsync("TaskUpdated", task);
             return Ok(task);
         }

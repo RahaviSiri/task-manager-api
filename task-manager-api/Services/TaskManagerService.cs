@@ -10,25 +10,47 @@ namespace task_manager_api.Services
         public TaskManagerService(TaskManagerRepository taskManagerRepository) {
             _taskManagerRepository = taskManagerRepository;
         }
-        public Task<List<Tasks>> GetTasksAsync()
+        public Task<List<TaskEntity>> GetTasksAsync()
         {
             return _taskManagerRepository.GetTasksAsync();
         }
 
-        public async Task<Tasks> CreateTasksAsync(CreateTaskDTO taskDTO)
+        public async Task<TaskEntity> CreateTasksAsync(CreateTaskDTO taskDTO)
         {
-            return await _taskManagerRepository.CreateTaskAsync(taskDTO);
+            TaskEntity task = new TaskEntity
+            {
+                Title = taskDTO.Title,
+                Description = taskDTO.Description,
+                StartDate = taskDTO.StartDate,
+                SubTasks = taskDTO.SubTasks,
+                Status = taskDTO.Status
+            };
+            return await _taskManagerRepository.CreateTaskAsync(task);
         }
 
-        public async Task<Tasks> UpdateTasksAsync(string Id, CreateTaskDTO taskDTO)
+        public async Task<TaskEntity> UpdateTasksAsync(string Id, CreateTaskDTO taskDTO)
         {
-            Tasks task = await _taskManagerRepository.GetTaskByIdAsync(Id);
+            var task = await _taskManagerRepository.GetTaskByIdAsync(Id);
+            if (task == null)
+            {
+                throw new KeyNotFoundException($"Task with id {Id} not found.");
+            }
+
             task.Title = taskDTO.Title;
-            return await _taskManagerRepository.UpdateTasksAsync(Id,task);
+            task.Description = taskDTO.Description;
+            task.StartDate = taskDTO.StartDate;
+            task.SubTasks = taskDTO.SubTasks;
+            task.Status = taskDTO.Status;
+            return await _taskManagerRepository.UpdateTaskAsync(Id,task);
         }
 
         public async Task<String> DeleteTaskAsync(string Id)
         {
+            var task = await _taskManagerRepository.GetTaskByIdAsync(Id);
+            if (task == null)
+            {
+                throw new KeyNotFoundException($"Task with id {Id} not found.");
+            }
             return await _taskManagerRepository.DeleteTaskAsync(Id);
         }
     }
