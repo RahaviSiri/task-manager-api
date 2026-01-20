@@ -8,46 +8,44 @@ namespace task_manager_api.Repository
 {
     public class TaskManagerRepository
     {
-        private readonly IMongoCollection<Tasks> _taskCollection;
+        private readonly IMongoCollection<TaskEntity> _taskCollection;
 
         public TaskManagerRepository(IOptions<MongoDbSettings> settings) {
             var setting = settings.Value;
 
             var mongoClient = new MongoClient(setting.ConnectionString);
             var mongoDatabase = mongoClient.GetDatabase(setting.DatabaseName);
-            _taskCollection = mongoDatabase.GetCollection<Tasks>(setting.CollectionName);
+            _taskCollection = mongoDatabase.GetCollection<TaskEntity>(setting.CollectionName);
         }
 
-        public async Task<List<Tasks>> GetTasksAsync()
+        public async Task<List<TaskEntity>> GetTasksAsync()
         {
-            List<Tasks> tasks = await _taskCollection.Find(_ => true).ToListAsync();
+            List<TaskEntity> tasks = await _taskCollection.Find(_ => true).ToListAsync();
             return tasks;
         }
 
-        public async Task<Tasks> CreateTaskAsync(CreateTaskDTO taskDTO)
+        public async Task<TaskEntity> CreateTaskAsync(TaskEntity task)
         {
-            Tasks task = new Tasks
-            {
-                Title = taskDTO.Title
-            };
             await _taskCollection.InsertOneAsync(task);
             return task;
         }
 
-        public async Task<Tasks> GetTaskByIdAsync(string Id)
+        public async Task<TaskEntity> GetTaskByIdAsync(string Id)
         {
             return await _taskCollection.Find(task => task.Id == Id).FirstOrDefaultAsync();
         }
 
-        public async Task<Tasks> UpdateTasksAsync(string Id, Tasks task)
+        public async Task<TaskEntity?> UpdateTaskAsync(string id, TaskEntity task)
         {
-            await _taskCollection.ReplaceOneAsync(t => t.Id == Id,task);
-            return task;
+            var result = await _taskCollection.ReplaceOneAsync(t => t.Id == id, task);
+            return result.MatchedCount == 0 ? null : task;
         }
 
         public async Task<String> DeleteTaskAsync(string Id)
         {
-            await _taskCollection.DeleteOneAsync(t => t.Id == Id);
+            var result = await _taskCollection.DeleteOneAsync(t => t.Id == Id);
+            if (result.DeletedCount == 0)
+                throw new KeyNotFoundException($"Task with id {Id} not found.");
             return Id;
         }
     }
